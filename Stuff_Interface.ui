@@ -96,7 +96,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>510</y>
+      <y>520</y>
       <width>113</width>
       <height>21</height>
      </rect>
@@ -105,7 +105,7 @@
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>70</y>
       <width>661</width>
       <height>361</height>
@@ -121,7 +121,7 @@
     </column>
     <column>
      <property name="text">
-      <string>New Column</string>
+      <string>Dish Name</string>
      </property>
     </column>
     <column>
@@ -129,6 +129,19 @@
       <string>Status</string>
      </property>
     </column>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>510</y>
+      <width>113</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Completed</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
