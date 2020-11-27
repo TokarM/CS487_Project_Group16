@@ -169,3 +169,4 @@ class customer_interface(object):
         self.pushButton_6.setText(_translate("MainWindow", "Pay"))
         self.menuPlace_an_Order.setTitle(_translate("MainWindow", "Place an Order"))
 
+

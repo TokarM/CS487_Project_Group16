@@ -23,6 +23,7 @@ class login_interface(object):
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(330, 290, 113, 32))
         self.pushButton.setObjectName("pushButton")
+        
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(350, 150, 71, 16))
         self.label.setObjectName("label")
@@ -47,3 +48,4 @@ class login_interface(object):
         self.pushButton.setText(_translate("MainWindow", "Enter"))
         self.label.setText(_translate("MainWindow", "Username"))
         self.label_2.setText(_translate("MainWindow", "Password"))
+        
