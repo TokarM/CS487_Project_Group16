@@ -100,12 +100,6 @@ class customer_interface(object):
         self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_5.setGeometry(QtCore.QRect(430, 400, 113, 51))
         self.pushButton_5.setObjectName("pushButton_5")
-        self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser.setGeometry(QtCore.QRect(770, 20, 191, 21))
-        self.textBrowser.setObjectName("textBrowser")
-        self.textBrowser_3 = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser_3.setGeometry(QtCore.QRect(770, 70, 151, 21))
-        self.textBrowser_3.setObjectName("textBrowser_3")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(770, 0, 111, 16))
         self.label_3.setObjectName("label_3")
@@ -115,6 +109,15 @@ class customer_interface(object):
         self.pushButton_6 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_6.setGeometry(QtCore.QRect(430, 470, 113, 51))
         self.pushButton_6.setObjectName("pushButton_6")
+        
+        self.customerName = QtWidgets.QLabel(self.centralwidget)
+        self.customerName.setGeometry(QtCore.QRect(770, 20, 59, 16))
+        self.customerName.setObjectName("customerName")
+        
+        self.points = QtWidgets.QLabel(self.centralwidget)
+        self.points.setGeometry(QtCore.QRect(770, 70, 59, 16))
+        self.points.setObjectName("points")
+        
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 996, 22))
@@ -166,7 +169,10 @@ class customer_interface(object):
         self.pushButton_5.setText(_translate("MainWindow", "Modify"))
         self.label_3.setText(_translate("MainWindow", "Customer Name"))
         self.label_5.setText(_translate("MainWindow", "Points"))
+        
         self.pushButton_6.setText(_translate("MainWindow", "Pay"))
+        self.customerName.setText(_translate("MainWindow", "Anonymous"))
+        
+        self.points.setText(_translate("MainWindow", "0"))
         self.menuPlace_an_Order.setTitle(_translate("MainWindow", "Place an Order"))
-
 
