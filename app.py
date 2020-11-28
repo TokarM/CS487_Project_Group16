@@ -59,22 +59,42 @@ class CustomerInterface(QMainWindow):
             
         self.ui = customer_interface()
         self.ui.setupUi(self)
-        cur.execute("SELECT * FROM menu")
-        menu = cur.fetchall()
         
-        for row in menu:
+        cur.execute("SELECT * FROM menu")
+        self.menu = cur.fetchall()
+        
+        for row in self.menu:
             row_count = self.ui.tableWidget.rowCount()
             self.ui.tableWidget.setRowCount(row_count+1)
             for i in range(2):
                 cell = QtWidgets.QTableWidgetItem(str(row[i]))
                 self.ui.tableWidget.setItem(row_count, i, cell)
         
-        if(customerID != 0):
-            cur.execute("SELECT * FROM customer_info WHERE customerID=%s;", (str(customerID)))
-            customer = Customer(cur.fetchone())
-            self.ui.customerName.setText(str(customer.name))
-            self.ui.points.setText(str(customer.points))
-            
+        cur.execute("SELECT * FROM customer_info WHERE customerID=%s;", (str(customerID)))
+        self.customer = Customer(cur.fetchone())
+        self.ui.customerName.setText(str(self.customer.name))
+        self.ui.points.setText(str(self.customer.points))
+    
+        self.ui.add.clicked = self.ui.add.clicked.connect(self.addItem) 
+        
+    def addItem(self):
+        items = self.ui.tableWidget.selectedItems()
+        if items:
+            self.customer.order.append(items[0].text())
+        
+        row_count = self.ui.tableWidget1.rowCount()
+        self.ui.tableWidget1.setRowCount(row_count+1)
+        
+        for item in self.menu:
+            if item[0] == items[0].text():
+                for i in range(3):
+                    cell = QtWidgets.QTableWidgetItem(str(item[i]))
+                    self.ui.tableWidget1.setItem(row_count, i, cell)
+                
+                cell = QtWidgets.QTableWidgetItem("Added")
+                self.ui.tableWidget1.setItem(row_count, 3, cell)
+        
+                    
         
 class StaffInterface(QMainWindow):
     def __init__(self, staffID):
@@ -96,7 +116,7 @@ class Customer():
             self.name = "Anonymous"
             self.address = None
             self.cardnumber = None
-            self.points = None
+            self.points = 0
             self.order = []
     
     def add_to_order(self, item, price, points):
@@ -104,7 +124,7 @@ class Customer():
         cur.execute("""INSERT INTO orders (customerid, item, points, price, ready)
                     VALUES (%s, %s, %s, %s, 1);
                     """,
-                    (customerID, item, points, price))
+                    (self.customerID, item, points, price))
         
 def connect():
     conn = None;

@@ -137,12 +137,12 @@
     </column>
     <column>
      <property name="text">
-      <string>Quantity</string>
+      <string>Price</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Price</string>
+      <string>Points</string>
      </property>
     </column>
     <column>
@@ -206,58 +206,6 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_4">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>70</y>
-      <width>91</width>
-      <height>37</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Default</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>70</y>
-      <width>111</width>
-      <height>33</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Sort Menu By:</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_5">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>60</y>
-      <width>131</width>
-      <height>37</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Price High to Low</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_6">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>60</y>
-      <width>141</width>
-      <height>37</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Price Low to High</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
@@ -301,7 +249,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>260</y>
+      <y>270</y>
       <width>113</width>
       <height>51</height>
      </rect>
@@ -314,26 +262,13 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>330</y>
+      <y>410</y>
       <width>113</width>
       <height>51</height>
      </rect>
     </property>
     <property name="text">
      <string>Submit</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_5">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>400</y>
-      <width>113</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Modify</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -366,7 +301,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>470</y>
+      <y>480</y>
       <width>113</width>
       <height>51</height>
      </rect>
@@ -399,6 +334,19 @@
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_5">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>340</y>
+      <width>113</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Remove</string>
     </property>
    </widget>
   </widget>
