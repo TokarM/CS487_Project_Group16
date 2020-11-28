@@ -101,8 +101,8 @@ class CustomerInterface(QMainWindow):
             for item in self.menu:
                 if order == item[0]:
 
-                    self.cur.execute("""INSERT INTO orders (customerid, item, price, points, ready)
-                    VALUES (%s, %s, %s, %s, FALSE);
+                    self.cur.execute("""INSERT INTO orders (customerid, item, price, points, ready, paid)
+                    VALUES (%s, %s, %s, %s, FALSE, FALSE);
                     """,
                     (str(self.customer.id), str(item[0]), str(item[1]), str(item[2])))
                     
