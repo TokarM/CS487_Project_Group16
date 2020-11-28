@@ -7,6 +7,7 @@ Created on Thu Nov 26 22:41:58 2020
 """
 import sys
 import psycopg2
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QMessageBox
 from login import login_interface
 from staff_interface import staff_interface
@@ -54,19 +55,56 @@ class CustomerInterface(QMainWindow):
     def __init__(self, customerID):
         super().__init__()
         
+        cur = connect()
+            
         self.ui = customer_interface()
         self.ui.setupUi(self)
+        cur.execute("SELECT * FROM menu")
+        menu = cur.fetchall()
+        
+        for row in menu:
+            row_count = self.ui.tableWidget.rowCount()
+            self.ui.tableWidget.setRowCount(row_count+1)
+            for i in range(2):
+                cell = QtWidgets.QTableWidgetItem(str(row[i]))
+                self.ui.tableWidget.setItem(row_count, i, cell)
         
         if(customerID != 0):
-            self.ui.customerName.setText(str(customerID))
-            self.ui.points.setText('5')
-        
+            cur.execute("SELECT * FROM customer_info WHERE customerID=%s;", (str(customerID)))
+            customer = Customer(cur.fetchone())
+            self.ui.customerName.setText(str(customer.name))
+            self.ui.points.setText(str(customer.points))
+            
         
 class StaffInterface(QMainWindow):
     def __init__(self, staffID):
         super().__init__()
         self.ui = staff_interface()
         self.ui.setupUi(self)
+        
+class Customer():
+    def __init__(self, customer_data):
+        if customer_data is not None:
+            self.id = customer_data[0]
+            self.name = customer_data[1] + " " + customer_data[2]
+            self.address = customer_data[3] + " " + customer_data[4]
+            self.cardnumber = customer_data[5]
+            self.points = customer_data[6]
+            self.order = []
+        else:
+            self.id = 0
+            self.name = "Anonymous"
+            self.address = None
+            self.cardnumber = None
+            self.points = None
+            self.order = []
+    
+    def add_to_order(self, item, price, points):
+        cur = connect()
+        cur.execute("""INSERT INTO orders (customerid, item, points, price, ready)
+                    VALUES (%s, %s, %s, %s, 1);
+                    """,
+                    (customerID, item, points, price))
         
 def connect():
     conn = None;
