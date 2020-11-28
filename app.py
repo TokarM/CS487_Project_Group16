@@ -55,13 +55,13 @@ class CustomerInterface(QMainWindow):
     def __init__(self, customerID):
         super().__init__()
         
-        cur = connect()
+        self.cur = connect()
             
         self.ui = customer_interface()
         self.ui.setupUi(self)
         
-        cur.execute("SELECT * FROM menu")
-        self.menu = cur.fetchall()
+        self.cur.execute("SELECT * FROM menu")
+        self.menu = self.cur.fetchall()
         
         for row in self.menu:
             row_count = self.ui.tableWidget.rowCount()
@@ -70,17 +70,18 @@ class CustomerInterface(QMainWindow):
                 cell = QtWidgets.QTableWidgetItem(str(row[i]))
                 self.ui.tableWidget.setItem(row_count, i, cell)
         
-        cur.execute("SELECT * FROM customer_info WHERE customerID=%s;", (str(customerID)))
-        self.customer = Customer(cur.fetchone())
+        self.cur.execute("SELECT * FROM customer_info WHERE customerID=%s;", (str(customerID)))
+        self.customer = Customer(self.cur.fetchone())
         self.ui.customerName.setText(str(self.customer.name))
         self.ui.points.setText(str(self.customer.points))
     
-        self.ui.add.clicked = self.ui.add.clicked.connect(self.addItem) 
+        self.ui.add.clicked = self.ui.add.clicked.connect(self.addItem)
+        self.ui.submit.clicked = self.ui.submit.clicked.connect(self.submitOrder) 
         
     def addItem(self):
         items = self.ui.tableWidget.selectedItems()
         if items:
-            self.customer.order.append(items[0].text())
+            self.customer.orders.append(items[0].text())
         
         row_count = self.ui.tableWidget1.rowCount()
         self.ui.tableWidget1.setRowCount(row_count+1)
@@ -93,7 +94,25 @@ class CustomerInterface(QMainWindow):
                 
                 cell = QtWidgets.QTableWidgetItem("Added")
                 self.ui.tableWidget1.setItem(row_count, 3, cell)
+                
+    def submitOrder(self):
+        index = 0
+        for order in self.customer.orders:
+            for item in self.menu:
+                if order == item[0]:
+
+                    self.cur.execute("""INSERT INTO orders (customerid, item, price, points, ready)
+                    VALUES (%s, %s, %s, %s, FALSE);
+                    """,
+                    (str(self.customer.id), str(item[0]), str(item[1]), str(item[2])))
+                    
+                    cell = QtWidgets.QTableWidgetItem("Submitted")
+                    self.ui.tableWidget1.setItem(index, 3, cell)
+                    
+                    self.customer.points += item[2]
+                    index = index + 1
         
+        self.customer.orders = []
                     
         
 class StaffInterface(QMainWindow):
@@ -110,21 +129,15 @@ class Customer():
             self.address = customer_data[3] + " " + customer_data[4]
             self.cardnumber = customer_data[5]
             self.points = customer_data[6]
-            self.order = []
+            self.orders = []
         else:
             self.id = 0
             self.name = "Anonymous"
             self.address = None
             self.cardnumber = None
             self.points = 0
-            self.order = []
+            self.orders = []
     
-    def add_to_order(self, item, price, points):
-        cur = connect()
-        cur.execute("""INSERT INTO orders (customerid, item, points, price, ready)
-                    VALUES (%s, %s, %s, %s, 1);
-                    """,
-                    (self.customerID, item, points, price))
         
 def connect():
     conn = None;
@@ -135,6 +148,8 @@ def connect():
             database="cs487_app",
             user="developer",
             password="1")
+        
+        conn.autocommit = True
         
         cur = conn.cursor()
         

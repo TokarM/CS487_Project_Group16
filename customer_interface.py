@@ -84,9 +84,10 @@ class customer_interface(object):
         self.add.setGeometry(QtCore.QRect(430, 270, 113, 51))
         self.add.setObjectName("add")
         
-        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_4.setGeometry(QtCore.QRect(430, 410, 113, 51))
-        self.pushButton_4.setObjectName("pushButton_4")
+        self.submit = QtWidgets.QPushButton(self.centralwidget)
+        self.submit.setGeometry(QtCore.QRect(430, 410, 113, 51))
+        self.submit.setObjectName("submit")
+        
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(770, 0, 111, 16))
         self.label_3.setObjectName("label_3")
@@ -150,7 +151,7 @@ class customer_interface(object):
         self.label_10.setText(_translate("MainWindow", "Total Cost: $10.97"))
         self.label_2.setText(_translate("MainWindow", "Your Order"))
         self.add.setText(_translate("MainWindow", "Add ->"))
-        self.pushButton_4.setText(_translate("MainWindow", "Submit"))
+        self.submit.setText(_translate("MainWindow", "Submit"))
         self.label_3.setText(_translate("MainWindow", "Customer Name"))
         self.label_5.setText(_translate("MainWindow", "Points"))
         self.pushButton_6.setText(_translate("MainWindow", "Pay"))
@@ -159,13 +160,4 @@ class customer_interface(object):
         self.pushButton_5.setText(_translate("MainWindow", "Remove"))
         self.menuPlace_an_Order.setTitle(_translate("MainWindow", "Place an Order"))
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 
