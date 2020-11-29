@@ -9,7 +9,7 @@ import sys
 import psycopg2
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QMessageBox
-from login import login_interface
+from Login import login_interface
 from staff_interface import staff_interface
 from customer_interface import customer_interface
 
@@ -97,14 +97,29 @@ class CustomerInterface(QMainWindow):
                 
     def submitOrder(self):
         index = 0
+
+        # get last largest transaction ID
+        self.cur.execute("SELECT MAX(transactionid) AS maxid FROM orders")
+        result = self.cur.fetchall()
+
+        largestID = 1
+
+        for i in result:
+            largestID = int(i[0])
+        
+        # set new transaction ID to last largest + 1
+        transactionID = largestID + 1
+
+
+
         for order in self.customer.orders:
             for item in self.menu:
                 if order == item[0]:
-
-                    self.cur.execute("""INSERT INTO orders (customerid, item, price, points, ready, paid)
-                    VALUES (%s, %s, %s, %s, FALSE, FALSE);
+                    # insert all items with same transaction ID
+                    self.cur.execute("""INSERT INTO orders (transactionid, customerid, item, price, points, ready, paid)
+                    VALUES (%s, %s, %s, %s, %s, FALSE, FALSE);
                     """,
-                    (str(self.customer.id), str(item[0]), str(item[1]), str(item[2])))
+                    (str(transactionID), str(self.customer.id), str(item[0]), str(item[2]), str(item[1])))
                     
                     cell = QtWidgets.QTableWidgetItem("Submitted")
                     self.ui.tableWidget1.setItem(index, 3, cell)
@@ -120,6 +135,55 @@ class StaffInterface(QMainWindow):
         super().__init__()
         self.ui = staff_interface()
         self.ui.setupUi(self)
+        
+        self.cur = connect()
+
+        self.updateTable()
+        
+
+    def handleReadyBtnClicked(self, orderedItemId):
+        button = QtWidgets.qApp.focusWidget()
+        index = self.ui.tableWidget.indexAt(button.pos())
+        if index.isValid():
+            button.setDisabled(True)
+            # change status of order row with ordereditemid = orderedItemId to ready = TRUE
+            update = "UPDATE orders SET ready = TRUE WHERE ordereditemid = {}".format(str(orderedItemId).upper())
+            self.cur.execute(update)
+            # change table cell from 'Not Ready' to 'Ready'
+            readyCell = QtWidgets.QTableWidgetItem('Ready')
+            self.ui.tableWidget.setItem(index.row(), 3, readyCell)
+            # refresh table, remove order if item was last to be ready
+            self.updateTable()
+
+    def updateTable(self):
+        # select orders that have items that are not ready
+        query = "SELECT ordereditemid, transactionid, item, ready, CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END FROM orders"
+
+        # self.cur.execute("SELECT * FROM orders WHERE ready = FALSE")
+
+        self.cur.execute(query)
+
+        self.orders = self.cur.fetchall()
+
+        for order in self.orders:
+            print(order)
+            row_count = self.ui.tableWidget.rowCount()
+            self.ui.tableWidget.setRowCount(row_count + 1)
+            orderedItemId = order[0]
+            transactionId = order[1]
+            itemName = order[2]
+            status = 'Not Ready' if order[3] == False else 'Ready'
+            
+
+            tableOrder =  [orderedItemId, transactionId, itemName, status]
+
+            for i in range(len(tableOrder)):
+                cell = QtWidgets.QTableWidgetItem(str(tableOrder[i]))
+                self.ui.tableWidget.setItem(row_count, i, cell)
+
+            change_btn = QtWidgets.QPushButton('Item Ready')
+            change_btn.clicked.connect(lambda: self.handleReadyBtnClicked(orderedItemId))
+            self.ui.tableWidget.setCellWidget(row_count, 4, change_btn)
         
 class Customer():
     def __init__(self, customer_data):
@@ -140,7 +204,7 @@ class Customer():
     
         
 def connect():
-    conn = None;
+    conn = None
     
     try:
         conn = psycopg2.connect(
@@ -160,13 +224,12 @@ def connect():
         # display the PostgreSQL database server version
         db_version = cur.fetchone()
         print(db_version)
+        return cur
        
 	# close the communication with the PostgreSQL
         #cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    
-    return cur
     
                 
 
