@@ -95,9 +95,10 @@ class customer_interface(object):
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(770, 50, 59, 16))
         self.label_5.setObjectName("label_5")
-        self.pushButton_6 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_6.setGeometry(QtCore.QRect(430, 480, 113, 51))
-        self.pushButton_6.setObjectName("pushButton_6")
+        
+        self.pay = QtWidgets.QPushButton(self.centralwidget)
+        self.pay.setGeometry(QtCore.QRect(430, 480, 113, 51))
+        self.pay.setObjectName("pay")
         
         self.customerName = QtWidgets.QLabel(self.centralwidget)
         self.customerName.setGeometry(QtCore.QRect(770, 20, 59, 16))
@@ -162,7 +163,9 @@ class customer_interface(object):
         
         self.label_3.setText(_translate("MainWindow", "Customer Name"))
         self.label_5.setText(_translate("MainWindow", "Points"))
-        self.pushButton_6.setText(_translate("MainWindow", "Pay"))
+        
+        self.pay.setText(_translate("MainWindow", "Pay"))
+        
         self.customerName.setText(_translate("MainWindow", "TextLabel"))
         self.points.setText(_translate("MainWindow", "TextLabel"))
         self.pushButton_5.setText(_translate("MainWindow", "Remove"))

@@ -8,11 +8,12 @@ Created on Thu Nov 26 22:41:58 2020
 import sys
 import psycopg2
 from datetime import datetime
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QMessageBox
 from Login import login_interface
 from staff_interface import Ui_staff_interface as staff_interface
 from customer_interface import customer_interface
+from checkout import checkout_dialog
 from functools import partial
 
 class Login(QMainWindow):
@@ -51,6 +52,7 @@ class Login(QMainWindow):
             msg = QMessageBox()
             msg.setText("Invalid Login Information")
             msg.exec_()
+            
         
         
 class CustomerInterface(QMainWindow):
@@ -79,6 +81,13 @@ class CustomerInterface(QMainWindow):
     
         self.ui.add.clicked = self.ui.add.clicked.connect(self.addItem)
         self.ui.submit.clicked = self.ui.submit.clicked.connect(self.submitOrder) 
+        self.ui.pay.clicked = self.ui.pay.clicked.connect(self.payForOrder)
+        
+    def payForOrder(self):
+        checkoutform = CheckoutDialog(self.customer, self.cur)
+        res = checkoutform.exec_()
+        
+        
         
     def addItem(self):
         items = self.ui.tableWidget.selectedItems()
@@ -121,13 +130,12 @@ class CustomerInterface(QMainWindow):
                     print('Here')
                     
                     # insert all items with same transaction ID
-                    self.cur.execute("""INSERT INTO orders 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, FALSE, FALSE);
+                    self.cur.execute("""INSERT INTO orders (transactionid, typeoforder, datetime, customerid, item, price, ready, paid)
+                    VALUES (%s, %s, %s, %s, %s, %s, FALSE, FALSE);
                     """,
-                    (str(transactionID), str(index), str(ordertype), str(datetime.now()),
-                     str(self.customer.id), str(item[0]), str(int(item[1])), str(item[2])))
+                    (str(transactionID), str(ordertype), str(datetime.now()),
+                     str(self.customer.id), str(item[0]), str(int(item[1]))))
                         
-                    
                         
                     cell = QtWidgets.QTableWidgetItem("Submitted")
                     self.ui.tableWidget1.setItem(index, 3, cell)
@@ -136,7 +144,32 @@ class CustomerInterface(QMainWindow):
                     index = index + 1
         
         self.customer.orders = []
-                    
+        
+class CheckoutDialog(QDialog):
+    def __init__(self, customer, cur, parent=None):
+        QDialog.__init__(self, parent)
+        cur.execute("SELECT price FROM orders WHERE customerid==%s AND paid==TRUE", (str(customer.id)))
+        
+        self.total = sum(cur.fetchall)
+        self.label_5.setText("$" + str(self.total))
+        self.label_6.setText("$" + str(self.customer.points))
+        self.ui = checkout_dialog()
+        self.ui.setupUi(self)
+        self.customer = customer
+        self.cur = cur
+        
+    def payByMoney(self):
+        update = "UPDATE orders SET paid = TRUE WHERE customerid = {}".format(str(self.customer.id))
+        self.cur.execute(update)
+        update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
+        self.cur.execute(update, (self.total*0.1, self.customer.id))
+        
+    def payByPoints(self):
+        if (self.customer.points > self.total):
+            update = "UPDATE orders SET paid = TRUE WHERE customerid = {}".format(str(self.customer.id))
+            self.cur.execute(update)
+            update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
+            self.cur.execute(update, (self.total*0.1, self.customer.id))
         
 class StaffInterface(QMainWindow):
     def __init__(self, staffID):
