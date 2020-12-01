@@ -17,7 +17,6 @@ class customer_interface(object):
         self.radioButton = QtWidgets.QRadioButton(self.centralwidget)
         self.radioButton.setGeometry(QtCore.QRect(290, 20, 91, 37))
         self.radioButton.setObjectName("radioButton")
-        self.radioButton.setChecked(True)
         self.radioButton_2 = QtWidgets.QRadioButton(self.centralwidget)
         self.radioButton_2.setGeometry(QtCore.QRect(400, 20, 101, 37))
         self.radioButton_2.setObjectName("radioButton_2")
@@ -25,7 +24,7 @@ class customer_interface(object):
         self.radioButton_3.setGeometry(QtCore.QRect(500, 20, 91, 37))
         self.radioButton_3.setObjectName("radioButton_3")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(40, 20, 291, 33))
+        self.label.setGeometry(QtCore.QRect(40, 20, 200, 33))
         self.label.setObjectName("label")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(1250, 1100, 471, 81))
@@ -107,12 +106,13 @@ class customer_interface(object):
         self.points.setGeometry(QtCore.QRect(770, 70, 59, 16))
         self.points.setObjectName("points")
         
-        self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_5.setGeometry(QtCore.QRect(430, 340, 113, 51))
-        self.pushButton_5.setObjectName("pushButton_5")
-        self.pushButton_7 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_7.setGeometry(QtCore.QRect(620, 0, 131, 32))
-        self.pushButton_7.setObjectName("pushButton_7")
+        #self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
+        #self.pushButton_5.setGeometry(QtCore.QRect(430, 340, 113, 51))
+        #self.pushButton_5.setObjectName("pushButton_5")
+        self.updateUser = QtWidgets.QPushButton(self.centralwidget)
+        self.updateUser.setGeometry(QtCore.QRect(620, 0, 131, 32))
+        self.updateUser.setObjectName("updateUser")
+        
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 996, 22))
@@ -168,8 +168,8 @@ class customer_interface(object):
         
         self.customerName.setText(_translate("MainWindow", "TextLabel"))
         self.points.setText(_translate("MainWindow", "TextLabel"))
-        self.pushButton_5.setText(_translate("MainWindow", "Remove"))
-        self.pushButton_7.setText(_translate("MainWindow", "Update user info"))
+        #self.pushButton_5.setText(_translate("MainWindow", "Remove"))
+        self.updateUser.setText(_translate("MainWindow", "Update user info"))
         self.menuPlace_an_Order.setTitle(_translate("MainWindow", "Place an Order"))
 
 

@@ -14,6 +14,7 @@ from Login import login_interface
 from staff_interface import Ui_staff_interface as staff_interface
 from customer_interface import customer_interface
 from checkout import checkout_dialog
+from update_user_info import update_user_info
 from functools import partial
 
 class Login(QMainWindow):
@@ -77,7 +78,7 @@ class CustomerInterface(QMainWindow):
         
         self.cur.execute("SELECT * FROM customer_info WHERE customerID=%s;", (str(customerID)))
         self.customer = Customer(self.cur.fetchone())
-        self.ui.customerName.setText(str(self.customer.name))
+        self.ui.customerName.setText(str(self.customer.firstname + " " + self.customer.lastname))
         self.ui.points.setText(str(self.customer.points))
         
         self.cur.execute("SELECT * FROM orders WHERE customerID=%s AND paid=FALSE;", (str(customerID)))
@@ -113,10 +114,15 @@ class CustomerInterface(QMainWindow):
         self.ui.add.clicked = self.ui.add.clicked.connect(self.addItem)
         self.ui.submit.clicked = self.ui.submit.clicked.connect(self.submitOrder) 
         self.ui.pay.clicked = self.ui.pay.clicked.connect(self.payForOrder)
+        self.ui.updateUser = self.ui.updateUser.clicked.connect(self.updateUserInfo)
         
     def payForOrder(self):
         checkoutform = CheckoutDialog(self.customer, self.cur, self.ui.tableWidget1)
         res = checkoutform.exec_()
+        
+    def updateUserInfo(self):
+        updateform = UpdateUserInfo(self.customer)
+        res = updateform.exec_()
         
         
     def addItem(self):
@@ -144,6 +150,13 @@ class CustomerInterface(QMainWindow):
                 self.ui.tableWidget1.setItem(row_count, 3, cell)
                 
     def submitOrder(self):
+        
+        if not self.customer.orders:
+            msg = QMessageBox()
+            msg.setText(f"Your order is empty!")
+            msg.exec_()
+            return
+        
         index = 0
 
         # get last largest transaction ID
@@ -151,8 +164,20 @@ class CustomerInterface(QMainWindow):
         result = self.cur.fetchall()
 
         largestID = 1
-        ordertype = 1
+        ordertype = 0
         
+        if self.ui.radioButton.isChecked():
+            ordertype = 1
+        elif self.ui.radioButton_2.isChecked():
+            ordertype = 2
+        elif self.ui.radioButton_3.isChecked():
+            ordertype = 3
+        else:
+            msg = QMessageBox()
+            msg.setText(f"Please select order type")
+            msg.exec_()
+            return
+            
         for i in result:
             if i[0] is not None:
                 largestID = int(i[0])
@@ -165,7 +190,6 @@ class CustomerInterface(QMainWindow):
         for order in self.customer.orders:
             for item in self.menu:
                 if order == item[0]:
-                    print('Here')
                     
                     # insert all items with same transaction ID
                     self.cur.execute("""INSERT INTO orders (transactionid, typeoforder, datetime, customerid, item, price, ready, paid)
@@ -192,8 +216,7 @@ class CustomerInterface(QMainWindow):
 class CheckoutDialog(QDialog):
     def __init__(self, customer, cur, order_table, parent=None):
         QDialog.__init__(self, parent)
-        cur.execute("SELECT price FROM orders WHERE customerid=%s AND paid=FALSE", (str(customer.id)))
-        
+        cur.execute("SELECT price FROM orders WHERE customerid=%s AND paid=FALSE AND ready=TRUE", (str(customer.id)))
         
         self.order_table = order_table
         self.total = 0
@@ -238,6 +261,18 @@ class CheckoutDialog(QDialog):
             msg = QMessageBox()
             msg.setText("Thank you for your payment")
             msg.exec_()
+            
+class UpdateUserInfo(QDialog):
+    def __init__(self, customer, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = update_user_info()
+        self.ui.setupUi(self)
+        
+        self.ui.firstNameLine.setText(customer.firstname)
+        self.ui.lastNameLine.setText(customer.lastname)
+        self.ui.addressLine.setText(customer.address)
+        self.ui.creditCardLine.setText(customer.cardnumber)
+        
         
 class StaffInterface(QMainWindow):
     def __init__(self, staffID):
@@ -349,14 +384,16 @@ class Customer():
     def __init__(self, customer_data):
         if customer_data is not None:
             self.id = customer_data[0]
-            self.name = customer_data[1] + " " + customer_data[2]
+            self.firstname = customer_data[1] 
+            self.lastname = customer_data[2]
             self.address = customer_data[3] + " " + customer_data[4]
             self.cardnumber = customer_data[5]
             self.points = customer_data[6]
             self.orders = []
         else:
             self.id = 0
-            self.name = "Anonymous"
+            self.firstname = "Anonymous"
+            self.lastname = ""
             self.address = None
             self.cardnumber = None
             self.points = 0
