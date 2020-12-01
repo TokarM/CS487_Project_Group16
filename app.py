@@ -7,6 +7,7 @@ Created on Thu Nov 26 22:41:58 2020
 """
 import sys
 import psycopg2
+from datetime import datetime
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QMessageBox
 from Login import login_interface
@@ -104,24 +105,30 @@ class CustomerInterface(QMainWindow):
         result = self.cur.fetchall()
 
         largestID = 1
-
+        ordertype = 1
+        
         for i in result:
-            largestID = int(i[0])
+            if i[0] is not None:
+                largestID = int(i[0])
         
         # set new transaction ID to last largest + 1
         transactionID = largestID + 1
-
-
+        
 
         for order in self.customer.orders:
             for item in self.menu:
                 if order == item[0]:
-                    # insert all items with same transaction ID
-                    self.cur.execute("""INSERT INTO orders (transactionid, customerid, item, price, points, ready, paid)
-                    VALUES (%s, %s, %s, %s, %s, FALSE, FALSE);
-                    """,
-                    (str(transactionID), str(self.customer.id), str(item[0]), str(item[2]), str(item[1])))
+                    print('Here')
                     
+                    # insert all items with same transaction ID
+                    self.cur.execute("""INSERT INTO orders 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, FALSE, FALSE);
+                    """,
+                    (str(transactionID), str(index), str(ordertype), str(datetime.now()),
+                     str(self.customer.id), str(item[0]), str(int(item[1])), str(item[2])))
+                        
+                    
+                        
                     cell = QtWidgets.QTableWidgetItem("Submitted")
                     self.ui.tableWidget1.setItem(index, 3, cell)
                     
@@ -146,7 +153,7 @@ class StaffInterface(QMainWindow):
 
     def updateTable(self):
         # select orders that have items that are not ready
-        query = "SELECT ordereditemid, transactionid, item, ready, CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END FROM orders ORDER BY transactionid, ordereditemid"
+        query = "SELECT orderitemid, transactionid, item, ready, CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END FROM orders ORDER BY transactionid, orderitemid"
         self.cur.execute(query)
 
         order_data = self.cur.fetchall()
