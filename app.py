@@ -125,7 +125,7 @@ class CustomerInterface(QMainWindow):
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, FALSE, FALSE);
                     """,
                     (str(transactionID), str(index), str(ordertype), str(datetime.now()),
-                     str(self.customer.id), str(item[0]), str(int(item[1])), str(item[2])))
+                     str(self.customer.id), str(item[0]), str(int(item[1])), int(str(item[2]))))
                         
                     
                         
@@ -153,7 +153,9 @@ class StaffInterface(QMainWindow):
 
     def updateTable(self):
         # select orders that have items that are not ready
-        query = "SELECT orderitemid, transactionid, item, ready, CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END FROM orders ORDER BY transactionid, orderitemid"
+        query = """SELECT orderitemid, transactionid, item, ready,
+                CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END
+                FROM orders ORDER BY transactionid, orderitemid"""
         self.cur.execute(query)
 
         order_data = self.cur.fetchall()
@@ -200,19 +202,28 @@ class Order():
         super().__init__()
         if orderArr is not None:
             self.index = index
-            self.orderedItemId = orderArr[0]
-            self.transactionId = orderArr[1]
-            self.itemName = orderArr[2]
-            self.status = 'Not Ready' if orderArr[3] == False else 'Ready'
-            self.numCols = len(orderArr)
+            self.transactionId = orderArr[0]
+            self.orderedItemId = orderArr[1]
+            self.typeOfOrder = orderArr[2]
+            self.dateTime = orderArr[3]
+            self.customerId = orderArr[4]
+            self.itemName = orderArr[5]
+            self.price = orderArr[6]
+            self.points = orderArr[7]
+            self.status = 'Not Ready' if orderArr[8] == False else 'Ready'
+            self.paid = orderArr[9]
             self.parent = parent
         else:
             self.orderedItemId = 0
             self.transactionId = 0
+            self.typeOfOrder = 1
+            self.dateTime = None
+            self.customerId = 0
             self.itemName = 'Undefined'
+            self.price = 0
+            self.points = 0
             self.status = 'Not Ready'
-            self.numCols = 4
-            self.orderTable = None
+            self.paid = False
             self.parent = None
 
     def initRow(self):
