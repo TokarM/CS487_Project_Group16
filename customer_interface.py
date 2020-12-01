@@ -8,7 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_MainWindow(object):
+class customer_interface(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(996, 733)
@@ -63,9 +63,9 @@ class Ui_MainWindow(object):
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(460, 1140, 181, 33))
         self.label_4.setObjectName("label_4")
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setGeometry(QtCore.QRect(1250, 1280, 481, 71))
-        self.pushButton_3.setObjectName("pushButton_3")
+        self.submit = QtWidgets.QPushButton(self.centralwidget)
+        self.submit.setGeometry(QtCore.QRect(1250, 1280, 481, 71))
+        self.submit.setObjectName("submit")
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
         self.label_7.setGeometry(QtCore.QRect(1390, 1230, 231, 33))
         self.label_7.setAlignment(QtCore.Qt.AlignCenter)
@@ -79,9 +79,11 @@ class Ui_MainWindow(object):
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(750, 140, 101, 16))
         self.label_2.setObjectName("label_2")
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setGeometry(QtCore.QRect(430, 270, 113, 51))
-        self.pushButton_2.setObjectName("pushButton_2")
+        
+        self.add = QtWidgets.QPushButton(self.centralwidget)
+        self.add.setGeometry(QtCore.QRect(430, 270, 113, 51))
+        self.add.setObjectName("Add")
+        
         self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_4.setGeometry(QtCore.QRect(430, 410, 113, 51))
         self.pushButton_4.setObjectName("pushButton_4")
@@ -94,12 +96,14 @@ class Ui_MainWindow(object):
         self.pushButton_6 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_6.setGeometry(QtCore.QRect(430, 480, 113, 51))
         self.pushButton_6.setObjectName("pushButton_6")
-        self.label_11 = QtWidgets.QLabel(self.centralwidget)
-        self.label_11.setGeometry(QtCore.QRect(770, 20, 59, 16))
-        self.label_11.setObjectName("label_11")
-        self.label_12 = QtWidgets.QLabel(self.centralwidget)
-        self.label_12.setGeometry(QtCore.QRect(770, 70, 59, 16))
-        self.label_12.setObjectName("label_12")
+        
+        self.customerName = QtWidgets.QLabel(self.centralwidget)
+        self.customerName.setGeometry(QtCore.QRect(770, 20, 59, 16))
+        self.customerName.setObjectName("customerName")
+        self.points = QtWidgets.QLabel(self.centralwidget)
+        self.points.setGeometry(QtCore.QRect(770, 70, 59, 16))
+        self.points.setObjectName("points")
+        
         self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_5.setGeometry(QtCore.QRect(430, 340, 113, 51))
         self.pushButton_5.setObjectName("pushButton_5")
@@ -143,29 +147,20 @@ class Ui_MainWindow(object):
         item = self.tableWidget1.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
         self.label_4.setText(_translate("MainWindow", "Order Progress"))
-        self.pushButton_3.setText(_translate("MainWindow", "Pay for Your Order"))
+        self.submit.setText(_translate("MainWindow", "Pay for Your Order"))
         self.label_7.setText(_translate("MainWindow", "Order Complete!"))
         self.label_9.setText(_translate("MainWindow", "Total Items: 5"))
         self.label_10.setText(_translate("MainWindow", "Total Cost: $10.97"))
         self.label_2.setText(_translate("MainWindow", "Your Order"))
-        self.pushButton_2.setText(_translate("MainWindow", "Add ->"))
+        self.add.setText(_translate("MainWindow", "Add ->"))
         self.pushButton_4.setText(_translate("MainWindow", "Submit"))
         self.label_3.setText(_translate("MainWindow", "Customer Name"))
         self.label_5.setText(_translate("MainWindow", "Points"))
         self.pushButton_6.setText(_translate("MainWindow", "Pay"))
-        self.label_11.setText(_translate("MainWindow", "TextLabel"))
-        self.label_12.setText(_translate("MainWindow", "TextLabel"))
+        self.customerName.setText(_translate("MainWindow", "TextLabel"))
+        self.points.setText(_translate("MainWindow", "TextLabel"))
         self.pushButton_5.setText(_translate("MainWindow", "Remove"))
         self.pushButton_7.setText(_translate("MainWindow", "Update user info"))
         self.menuPlace_an_Order.setTitle(_translate("MainWindow", "Place an Order"))
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 

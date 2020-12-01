@@ -8,15 +8,17 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_MainWindow(object):
+class login_interface(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(240, 280, 151, 32))
-        self.pushButton.setObjectName("pushButton")
+        
+        self.loginButton = QtWidgets.QPushButton(self.centralwidget)
+        self.loginButton.setGeometry(QtCore.QRect(240, 280, 151, 32))
+        self.loginButton.setObjectName("loginButton")
+        
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(360, 160, 71, 16))
         self.label.setObjectName("label")
@@ -53,20 +55,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.pushButton.setText(_translate("MainWindow", "Enter"))
+        self.loginButton.setText(_translate("MainWindow", "Enter"))
         self.label.setText(_translate("MainWindow", "Username"))
         self.label_2.setText(_translate("MainWindow", "Password"))
         self.pushButton_2.setText(_translate("MainWindow", "Login Anonymously "))
         self.pushButton_3.setText(_translate("MainWindow", "Forgot Password"))
         self.pushButton_4.setText(_translate("MainWindow", "Sign Up"))
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 
