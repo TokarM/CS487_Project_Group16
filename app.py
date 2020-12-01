@@ -10,8 +10,9 @@ import psycopg2
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QMessageBox
 from Login import login_interface
-from staff_interface import staff_interface
+from staff_interface import Ui_staff_interface as staff_interface
 from customer_interface import customer_interface
+from functools import partial
 
 class Login(QMainWindow):
     def __init__(self):
@@ -137,54 +138,94 @@ class StaffInterface(QMainWindow):
         self.ui.setupUi(self)
         
         self.cur = connect()
+        self.table = self.ui.ordersTableWidget
 
         self.updateTable()
-        
-
-    def handleReadyBtnClicked(self, orderedItemId):
-        button = QtWidgets.qApp.focusWidget()
-        index = self.ui.tableWidget.indexAt(button.pos())
-        if index.isValid():
-            button.setDisabled(True)
-            # change status of order row with ordereditemid = orderedItemId to ready = TRUE
-            update = "UPDATE orders SET ready = TRUE WHERE ordereditemid = {}".format(str(orderedItemId).upper())
-            self.cur.execute(update)
-            # change table cell from 'Not Ready' to 'Ready'
-            readyCell = QtWidgets.QTableWidgetItem('Ready')
-            self.ui.tableWidget.setItem(index.row(), 3, readyCell)
-            # refresh table, remove order if item was last to be ready
-            self.updateTable()
 
     def updateTable(self):
         # select orders that have items that are not ready
-        query = "SELECT ordereditemid, transactionid, item, ready, CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END FROM orders"
-
-        # self.cur.execute("SELECT * FROM orders WHERE ready = FALSE")
-
+        query = "SELECT ordereditemid, transactionid, item, ready, CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END FROM orders ORDER BY transactionid, ordereditemid"
         self.cur.execute(query)
 
-        self.orders = self.cur.fetchall()
+        order_data = self.cur.fetchall()
 
-        for order in self.orders:
-            print(order)
-            row_count = self.ui.tableWidget.rowCount()
-            self.ui.tableWidget.setRowCount(row_count + 1)
-            orderedItemId = order[0]
-            transactionId = order[1]
-            itemName = order[2]
-            status = 'Not Ready' if order[3] == False else 'Ready'
+        # only keep ordered items whose transactions still have items that are not ready
+        order_data = list(filter(lambda order_row: order_row[-1] == 'N', order_data))
+
+        self.table.setRowCount(len(order_data))
+
+        index = 0
+        order_rows = []
+
+        #init rows
+        for orderArr in order_data:
+            order = Order(index, orderArr, self)
+            order_rows.append(order)
+            index += 1
+
+        # add rows to table
+        for order in order_rows:
+            order.initRow()
+
+        # init change status buttons
+        for order in order_rows:
+            order.initChangeBtn()
+
+        
+    def statusBtnClick(self, index, orderedItemId):
+        button = QtWidgets.qApp.focusWidget()
+        button.setDisabled(True)
+        
+        # change status of order row with ordereditemid = orderedItemId to ready = TRUE
+        update = "UPDATE orders SET ready = TRUE WHERE ordereditemid = {}".format(str(orderedItemId))
+        self.cur.execute(update)
+        # change table cell from 'Not Ready' to 'Ready'
+        readyCell = QtWidgets.QTableWidgetItem('Ready')
+        self.table.setItem(index, 3, readyCell)
+        # refresh table, remove order if item was last to be ready
+        self.updateTable()
+
+
+class Order():
+    def __init__(self, index, orderArr, parent):
+        super().__init__()
+        if orderArr is not None:
+            self.index = index
+            self.orderedItemId = orderArr[0]
+            self.transactionId = orderArr[1]
+            self.itemName = orderArr[2]
+            self.status = 'Not Ready' if orderArr[3] == False else 'Ready'
+            self.numCols = len(orderArr)
+            self.parent = parent
+        else:
+            self.orderedItemId = 0
+            self.transactionId = 0
+            self.itemName = 'Undefined'
+            self.status = 'Not Ready'
+            self.numCols = 4
+            self.orderTable = None
+            self.parent = None
+
+    def initRow(self):
+        idCol = QtWidgets.QTableWidgetItem(str(self.orderedItemId))
+        transactionIdCol = QtWidgets.QTableWidgetItem(str(self.transactionId))
+        itemCol = QtWidgets.QTableWidgetItem(str(self.itemName))
+        statusCol = QtWidgets.QTableWidgetItem(str(self.status))
+
+        self.parent.table.setItem(self.index, 0, idCol)
+        self.parent.table.setItem(self.index, 1, transactionIdCol)
+        self.parent.table.setItem(self.index, 2, itemCol)
+        self.parent.table.setItem(self.index, 3, statusCol)
+
+    def initChangeBtn(self):
+        change_btn = QtWidgets.QPushButton('Item Ready')
+        self.parent.table.setCellWidget(self.index, 4, change_btn)
+        if self.status == 'Ready':
+            change_btn.setDisabled(True)
+        change_btn.clicked.connect(partial(self.parent.statusBtnClick, self.index, self.orderedItemId))
             
 
-            tableOrder =  [orderedItemId, transactionId, itemName, status]
 
-            for i in range(len(tableOrder)):
-                cell = QtWidgets.QTableWidgetItem(str(tableOrder[i]))
-                self.ui.tableWidget.setItem(row_count, i, cell)
-
-            change_btn = QtWidgets.QPushButton('Item Ready')
-            change_btn.clicked.connect(lambda: self.handleReadyBtnClicked(orderedItemId))
-            self.ui.tableWidget.setCellWidget(row_count, 4, change_btn)
-        
 class Customer():
     def __init__(self, customer_data):
         if customer_data is not None:
@@ -216,14 +257,7 @@ def connect():
         conn.autocommit = True
         
         cur = conn.cursor()
-        
-        # execute a statement
-        print('PostgreSQL database version:')
-        cur.execute('SELECT version()')
-    
-        # display the PostgreSQL database server version
-        db_version = cur.fetchone()
-        print(db_version)
+
         return cur
        
 	# close the communication with the PostgreSQL
@@ -233,7 +267,7 @@ def connect():
     
                 
 
-app = QApplication(sys.argv)
+app = QtWidgets.QApplication(sys.argv)
 gui = Login()
 gui.show()
 sys.exit(app.exec_())
