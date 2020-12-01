@@ -140,6 +140,8 @@ class StaffInterface(QMainWindow):
         self.cur = connect()
         self.table = self.ui.ordersTableWidget
 
+        self.ui.update_orders_btn.clicked.connect(self.updateTable)
+
         self.updateTable()
 
     def updateTable(self):
@@ -251,8 +253,8 @@ def connect():
         conn = psycopg2.connect(
             host="localhost",
             database="cs487_app",
-            user="developer",
-            password="1")
+            user="postgres",
+            password="at}&G?/.ncF7.9rz")
         
         conn.autocommit = True
         
