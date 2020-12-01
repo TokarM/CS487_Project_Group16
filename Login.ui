@@ -77,7 +77,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>280</y>
+      <y>320</y>
       <width>151</width>
       <height>32</height>
      </rect>
@@ -89,14 +89,27 @@
    <widget class="QPushButton" name="pushButton_3">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>320</y>
+      <x>390</x>
+      <y>280</y>
       <width>151</width>
       <height>32</height>
      </rect>
     </property>
     <property name="text">
      <string>Forgot Password</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_4">
+    <property name="geometry">
+     <rect>
+      <x>242</x>
+      <y>320</y>
+      <width>151</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sign Up</string>
     </property>
    </widget>
   </widget>

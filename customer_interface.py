@@ -8,7 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class customer_interface(object):
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(996, 733)
@@ -18,10 +18,10 @@ class customer_interface(object):
         self.radioButton.setGeometry(QtCore.QRect(290, 20, 91, 37))
         self.radioButton.setObjectName("radioButton")
         self.radioButton_2 = QtWidgets.QRadioButton(self.centralwidget)
-        self.radioButton_2.setGeometry(QtCore.QRect(420, 20, 101, 37))
+        self.radioButton_2.setGeometry(QtCore.QRect(400, 20, 101, 37))
         self.radioButton_2.setObjectName("radioButton_2")
         self.radioButton_3 = QtWidgets.QRadioButton(self.centralwidget)
-        self.radioButton_3.setGeometry(QtCore.QRect(560, 20, 91, 37))
+        self.radioButton_3.setGeometry(QtCore.QRect(500, 20, 91, 37))
         self.radioButton_3.setObjectName("radioButton_3")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(40, 20, 291, 33))
@@ -79,15 +79,12 @@ class customer_interface(object):
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(750, 140, 101, 16))
         self.label_2.setObjectName("label_2")
-        
-        self.add = QtWidgets.QPushButton(self.centralwidget)
-        self.add.setGeometry(QtCore.QRect(430, 270, 113, 51))
-        self.add.setObjectName("add")
-        
-        self.submit = QtWidgets.QPushButton(self.centralwidget)
-        self.submit.setGeometry(QtCore.QRect(430, 410, 113, 51))
-        self.submit.setObjectName("submit")
-        
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_2.setGeometry(QtCore.QRect(430, 270, 113, 51))
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_4.setGeometry(QtCore.QRect(430, 410, 113, 51))
+        self.pushButton_4.setObjectName("pushButton_4")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(770, 0, 111, 16))
         self.label_3.setObjectName("label_3")
@@ -97,17 +94,18 @@ class customer_interface(object):
         self.pushButton_6 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_6.setGeometry(QtCore.QRect(430, 480, 113, 51))
         self.pushButton_6.setObjectName("pushButton_6")
-        self.customerName = QtWidgets.QLabel(self.centralwidget)
-        
-        self.customerName.setGeometry(QtCore.QRect(770, 20, 59, 16))
-        self.customerName.setObjectName("customerName")
-        self.points = QtWidgets.QLabel(self.centralwidget)
-        self.points.setGeometry(QtCore.QRect(770, 70, 59, 16))
-        self.points.setObjectName("points")
-        
+        self.label_11 = QtWidgets.QLabel(self.centralwidget)
+        self.label_11.setGeometry(QtCore.QRect(770, 20, 59, 16))
+        self.label_11.setObjectName("label_11")
+        self.label_12 = QtWidgets.QLabel(self.centralwidget)
+        self.label_12.setGeometry(QtCore.QRect(770, 70, 59, 16))
+        self.label_12.setObjectName("label_12")
         self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_5.setGeometry(QtCore.QRect(430, 340, 113, 51))
         self.pushButton_5.setObjectName("pushButton_5")
+        self.pushButton_7 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_7.setGeometry(QtCore.QRect(620, 0, 131, 32))
+        self.pushButton_7.setObjectName("pushButton_7")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 996, 22))
@@ -150,14 +148,24 @@ class customer_interface(object):
         self.label_9.setText(_translate("MainWindow", "Total Items: 5"))
         self.label_10.setText(_translate("MainWindow", "Total Cost: $10.97"))
         self.label_2.setText(_translate("MainWindow", "Your Order"))
-        self.add.setText(_translate("MainWindow", "Add ->"))
-        self.submit.setText(_translate("MainWindow", "Submit"))
+        self.pushButton_2.setText(_translate("MainWindow", "Add ->"))
+        self.pushButton_4.setText(_translate("MainWindow", "Submit"))
         self.label_3.setText(_translate("MainWindow", "Customer Name"))
         self.label_5.setText(_translate("MainWindow", "Points"))
         self.pushButton_6.setText(_translate("MainWindow", "Pay"))
-        self.customerName.setText(_translate("MainWindow", "TextLabel"))
-        self.points.setText(_translate("MainWindow", "TextLabel"))
+        self.label_11.setText(_translate("MainWindow", "TextLabel"))
+        self.label_12.setText(_translate("MainWindow", "TextLabel"))
         self.pushButton_5.setText(_translate("MainWindow", "Remove"))
+        self.pushButton_7.setText(_translate("MainWindow", "Update user info"))
         self.menuPlace_an_Order.setTitle(_translate("MainWindow", "Place an Order"))
 
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
 
