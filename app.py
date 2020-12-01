@@ -152,8 +152,10 @@ class CustomerInterface(QMainWindow):
                     self.cur.execute("""INSERT INTO orders (transactionid, typeoforder, datetime, customerid, item, price, ready, paid)
                     VALUES (%s, %s, %s, %s, %s, %s, FALSE, FALSE);
                     """,
+
                     (str(transactionID), str(ordertype), str(datetime.now()),
                      str(self.customer.id), str(item[0]), str(int(item[1]))))
+
                         
                         
                     cell = QtWidgets.QTableWidgetItem("Submitted")
@@ -169,7 +171,10 @@ class CheckoutDialog(QDialog):
         QDialog.__init__(self, parent)
         cur.execute("SELECT price FROM orders WHERE customerid=%s AND paid=TRUE", (str(customer.id)))
         
-        self.total = sum(cur.fetchall())
+        self.total = 0
+        items = cur.fetchall()
+        for item in items:
+            self.total += item[0]
         
         self.ui = checkout_dialog()
         self.ui.setupUi(self)
@@ -213,7 +218,9 @@ class StaffInterface(QMainWindow):
 
     def updateTable(self):
         # select orders that have items that are not ready
-        query = "SELECT orderitemid, transactionid, item, ready, CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END FROM orders ORDER BY transactionid, orderitemid"
+        query = """SELECT orderitemid, transactionid, typeoforder, item, ready, 
+                CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END
+                FROM orders ORDER BY transactionid, orderitemid"""
         self.cur.execute(query)
 
         order_data = self.cur.fetchall()
@@ -243,7 +250,7 @@ class StaffInterface(QMainWindow):
         
     def statusBtnClick(self, index, orderedItemId):
         button = QtWidgets.qApp.focusWidget()
-        button.setDisabled(True)
+        #button.setDisabled(True)
         
         # change status of order row with ordereditemid = orderedItemId to ready = TRUE
         update = "UPDATE orders SET ready = TRUE WHERE orderitemid = {}".format(str(orderedItemId))
@@ -260,40 +267,47 @@ class Order():
         super().__init__()
         if orderArr is not None:
             self.index = index
-            self.orderedItemId = orderArr[0]
+            self.orderItemId = orderArr[0]
             self.transactionId = orderArr[1]
-            self.itemName = orderArr[2]
-            self.status = 'Not Ready' if orderArr[3] == False else 'Ready'
-            self.numCols = len(orderArr)
+            self.typeOfOrder = orderArr[2]
+            self.itemName = orderArr[3]
+            self.status = 'Not Ready' if orderArr[4] == False else 'Ready'
             self.parent = parent
         else:
-            self.orderedItemId = 0
+            self.orderItemId = 0
             self.transactionId = 0
+            self.typeOfOrder = 1
             self.itemName = 'Undefined'
             self.status = 'Not Ready'
-            self.numCols = 4
-            self.orderTable = None
             self.parent = None
 
     def initRow(self):
-        idCol = QtWidgets.QTableWidgetItem(str(self.orderedItemId))
-        transactionIdCol = QtWidgets.QTableWidgetItem(str(self.transactionId))
-        itemCol = QtWidgets.QTableWidgetItem(str(self.itemName))
+        idCol = QtWidgets.QTableWidgetItem(str(self.orderItemId))
+        orderNumCol = QtWidgets.QTableWidgetItem(str(self.transactionId))
+        typeCol = QtWidgets.QTableWidgetItem(self.getTypeStr(self.typeOfOrder))
+        dishNameCol = QtWidgets.QTableWidgetItem(str(self.itemName))
         statusCol = QtWidgets.QTableWidgetItem(str(self.status))
 
         self.parent.table.setItem(self.index, 0, idCol)
-        self.parent.table.setItem(self.index, 1, transactionIdCol)
-        self.parent.table.setItem(self.index, 2, itemCol)
-        self.parent.table.setItem(self.index, 3, statusCol)
+        self.parent.table.setItem(self.index, 1, orderNumCol)
+        self.parent.table.setItem(self.index, 2, typeCol)
+        self.parent.table.setItem(self.index, 3, dishNameCol)
+        self.parent.table.setItem(self.index, 4, statusCol)
 
     def initChangeBtn(self):
         change_btn = QtWidgets.QPushButton('Item Ready')
-        self.parent.table.setCellWidget(self.index, 4, change_btn)
+        self.parent.table.setCellWidget(self.index, 5, change_btn)
         if self.status == 'Ready':
             change_btn.setDisabled(True)
-        change_btn.clicked.connect(partial(self.parent.statusBtnClick, self.index, self.orderedItemId))
-            
+        change_btn.clicked.connect(partial(self.parent.statusBtnClick, self.index, self.orderItemId))
 
+    def getTypeStr(self, typeInt):
+        typeMap = {
+            1 : 'Dine-In',
+            2 : 'Pickup',
+            3 : 'Delivery'
+        }
+        return typeMap.get(typeInt)
 
 class Customer():
     def __init__(self, customer_data):

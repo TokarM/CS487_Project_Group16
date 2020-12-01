@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1434</width>
-    <height>1200</height>
+    <width>1556</width>
+    <height>1058</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1434</width>
+    <width>1496</width>
     <height>812</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1480</width>
+    <width>1556</width>
     <height>1200</height>
    </size>
   </property>
@@ -51,7 +51,7 @@
       <x>30</x>
       <y>100</y>
       <width>201</width>
-      <height>81</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
@@ -61,8 +61,8 @@
    <widget class="QPushButton" name="update_orders_btn">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>440</y>
+      <x>710</x>
+      <y>920</y>
       <width>201</width>
       <height>71</height>
      </rect>
@@ -76,7 +76,7 @@
      <rect>
       <x>260</x>
       <y>110</y>
-      <width>1151</width>
+      <width>1261</width>
       <height>771</height>
      </rect>
     </property>
@@ -105,7 +105,7 @@
      <bool>true</bool>
     </property>
     <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>217</number>
+     <number>207</number>
     </attribute>
     <attribute name="horizontalHeaderMinimumSectionSize">
      <number>60</number>
@@ -123,7 +123,12 @@
     </column>
     <column>
      <property name="text">
-      <string>Order Number</string>
+      <string>Order #</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Type</string>
      </property>
     </column>
     <column>
@@ -145,20 +150,20 @@
    <widget class="QPushButton" name="update_menu_btn">
     <property name="geometry">
      <rect>
-      <x>910</x>
+      <x>1000</x>
       <y>30</y>
       <width>231</width>
       <height>57</height>
      </rect>
     </property>
     <property name="text">
-     <string>Update Menu</string>
+     <string>Change Menu</string>
     </property>
    </widget>
    <widget class="QPushButton" name="logout_btn">
     <property name="geometry">
      <rect>
-      <x>1170</x>
+      <x>1280</x>
       <y>30</y>
       <width>231</width>
       <height>57</height>
@@ -172,85 +177,6 @@
     </property>
     <property name="text">
      <string>Log Out</string>
-    </property>
-   </widget>
-   <widget class="QTableWidget" name="ordersTableWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>910</y>
-      <width>1151</width>
-      <height>221</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
-    </property>
-    <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-    <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::AdjustToContents</enum>
-    </property>
-    <property name="showGrid">
-     <bool>true</bool>
-    </property>
-    <property name="sortingEnabled">
-     <bool>true</bool>
-    </property>
-    <property name="cornerButtonEnabled">
-     <bool>true</bool>
-    </property>
-    <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>279</number>
-    </attribute>
-    <attribute name="horizontalHeaderMinimumSectionSize">
-     <number>89</number>
-    </attribute>
-    <attribute name="verticalHeaderVisible">
-     <bool>false</bool>
-    </attribute>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>140</number>
-    </attribute>
-    <column>
-     <property name="text">
-      <string>Order Number</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Address</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Assign Driver</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Change Status</string>
-     </property>
-    </column>
-   </widget>
-   <widget class="QLabel" name="table_label_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>910</y>
-      <width>201</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Delivery Orders :</string>
     </property>
    </widget>
   </widget>
