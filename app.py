@@ -90,8 +90,16 @@ class CustomerInterface(QMainWindow):
                 if order[5] == item[0]:
                     orders_row_count = self.ui.tableWidget1.rowCount()
                     self.ui.tableWidget1.setRowCount(orders_row_count+1)
+                    
                     for i in range(3):
-                        cell = QtWidgets.QTableWidgetItem(str(item[i]))
+                        
+                        
+                        if i == 2:
+                            value = item[1] * 0.1
+                        else:
+                            value = item[i]
+                        
+                        cell = QtWidgets.QTableWidgetItem(str(value))
                         self.ui.tableWidget1.setItem(orders_row_count, i, cell)
                     if (order[7] == False):
                         cell = QtWidgets.QTableWidgetItem("Not ready")
@@ -107,7 +115,7 @@ class CustomerInterface(QMainWindow):
         self.ui.pay.clicked = self.ui.pay.clicked.connect(self.payForOrder)
         
     def payForOrder(self):
-        checkoutform = CheckoutDialog(self.customer, self.cur)
+        checkoutform = CheckoutDialog(self.customer, self.cur, self.ui.tableWidget1)
         res = checkoutform.exec_()
         
         
@@ -122,7 +130,14 @@ class CustomerInterface(QMainWindow):
         for item in self.menu:
             if item[0] == items[0].text():
                 for i in range(3):
-                    cell = QtWidgets.QTableWidgetItem(str(item[i]))
+                    
+                    
+                    if i == 2:
+                        value = item[1] * 0.1
+                    else:
+                        value = item[i]
+                    
+                    cell = QtWidgets.QTableWidgetItem(str(value))
                     self.ui.tableWidget1.setItem(row_count, i, cell)
                 
                 cell = QtWidgets.QTableWidgetItem("Added")
@@ -144,6 +159,7 @@ class CustomerInterface(QMainWindow):
         
         # set new transaction ID to last largest + 1
         transactionID = largestID + 1
+        time = 0
         
 
         for order in self.customer.orders:
@@ -159,7 +175,7 @@ class CustomerInterface(QMainWindow):
                     (str(transactionID), str(ordertype), str(datetime.now()),
                      str(self.customer.id), str(item[0]), str(int(item[1]))))
 
-                        
+                    time += item[2]  
                         
                     cell = QtWidgets.QTableWidgetItem("Submitted")
                     self.ui.tableWidget1.setItem(index, 3, cell)
@@ -169,11 +185,17 @@ class CustomerInterface(QMainWindow):
         
         self.customer.orders = []
         
-class CheckoutDialog(QDialog):
-    def __init__(self, customer, cur, parent=None):
-        QDialog.__init__(self, parent)
-        cur.execute("SELECT price FROM orders WHERE customerid=%s AND paid=TRUE", (str(customer.id)))
+        msg = QMessageBox()
+        msg.setText(f"Approximate Waiting Time {time} minutes")
+        msg.exec_()
         
+class CheckoutDialog(QDialog):
+    def __init__(self, customer, cur, order_table, parent=None):
+        QDialog.__init__(self, parent)
+        cur.execute("SELECT price FROM orders WHERE customerid=%s AND paid=FALSE", (str(customer.id)))
+        
+        
+        self.order_table = order_table
         self.total = 0
         items = cur.fetchall()
         for item in items:
@@ -197,6 +219,13 @@ class CheckoutDialog(QDialog):
         self.cur.execute(update)
         update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
         self.cur.execute(update, (self.total*0.1, self.customer.id))
+        
+        msg = QMessageBox()
+        msg.setText("Thank you for your payment")
+        msg.exec_()
+        
+        self.order_table.setRowCount(0)
+        self.order_table.setColumnCount(0)
         self.close()
         
     def payByPoints(self):
@@ -205,6 +234,10 @@ class CheckoutDialog(QDialog):
             self.cur.execute(update)
             update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
             self.cur.execute(update, (self.total*0.1, self.customer.id))
+            
+            msg = QMessageBox()
+            msg.setText("Thank you for your payment")
+            msg.exec_()
         
 class StaffInterface(QMainWindow):
     def __init__(self, staffID):
