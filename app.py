@@ -153,7 +153,7 @@ class StaffInterface(QMainWindow):
 
     def updateTable(self):
         # select orders that have items that are not ready
-        query = """SELECT orderitemid, transactionid, item, ready,
+        query = """SELECT orderitemid, transactionid, typeoforder, item, ready, 
                 CASE WHEN COUNT(CASE WHEN ready = FALSE THEN 1 END) OVER (PARTITION BY transactionid) = 0 THEN 'Y' ELSE 'N' END
                 FROM orders ORDER BY transactionid, orderitemid"""
         self.cur.execute(query)
@@ -188,7 +188,7 @@ class StaffInterface(QMainWindow):
         button.setDisabled(True)
         
         # change status of order row with ordereditemid = orderedItemId to ready = TRUE
-        update = "UPDATE orders SET ready = TRUE WHERE ordereditemid = {}".format(str(orderedItemId))
+        update = "UPDATE orders SET ready = TRUE WHERE orderitemid = {}".format(str(orderedItemId))
         self.cur.execute(update)
         # change table cell from 'Not Ready' to 'Ready'
         readyCell = QtWidgets.QTableWidgetItem('Ready')
@@ -202,49 +202,47 @@ class Order():
         super().__init__()
         if orderArr is not None:
             self.index = index
-            self.transactionId = orderArr[0]
-            self.orderedItemId = orderArr[1]
+            self.orderItemId = orderArr[0]
+            self.transactionId = orderArr[1]
             self.typeOfOrder = orderArr[2]
-            self.dateTime = orderArr[3]
-            self.customerId = orderArr[4]
-            self.itemName = orderArr[5]
-            self.price = orderArr[6]
-            self.points = orderArr[7]
-            self.status = 'Not Ready' if orderArr[8] == False else 'Ready'
-            self.paid = orderArr[9]
+            self.itemName = orderArr[3]
+            self.status = 'Not Ready' if orderArr[4] == False else 'Ready'
             self.parent = parent
         else:
-            self.orderedItemId = 0
+            self.orderItemId = 0
             self.transactionId = 0
             self.typeOfOrder = 1
-            self.dateTime = None
-            self.customerId = 0
             self.itemName = 'Undefined'
-            self.price = 0
-            self.points = 0
             self.status = 'Not Ready'
-            self.paid = False
             self.parent = None
 
     def initRow(self):
-        idCol = QtWidgets.QTableWidgetItem(str(self.orderedItemId))
-        transactionIdCol = QtWidgets.QTableWidgetItem(str(self.transactionId))
-        itemCol = QtWidgets.QTableWidgetItem(str(self.itemName))
+        idCol = QtWidgets.QTableWidgetItem(str(self.orderItemId))
+        orderNumCol = QtWidgets.QTableWidgetItem(str(self.transactionId))
+        typeCol = QtWidgets.QTableWidgetItem(self.getTypeStr(self.typeOfOrder))
+        dishNameCol = QtWidgets.QTableWidgetItem(str(self.itemName))
         statusCol = QtWidgets.QTableWidgetItem(str(self.status))
 
         self.parent.table.setItem(self.index, 0, idCol)
-        self.parent.table.setItem(self.index, 1, transactionIdCol)
-        self.parent.table.setItem(self.index, 2, itemCol)
-        self.parent.table.setItem(self.index, 3, statusCol)
+        self.parent.table.setItem(self.index, 1, orderNumCol)
+        self.parent.table.setItem(self.index, 2, typeCol)
+        self.parent.table.setItem(self.index, 3, dishNameCol)
+        self.parent.table.setItem(self.index, 4, statusCol)
 
     def initChangeBtn(self):
         change_btn = QtWidgets.QPushButton('Item Ready')
-        self.parent.table.setCellWidget(self.index, 4, change_btn)
+        self.parent.table.setCellWidget(self.index, 5, change_btn)
         if self.status == 'Ready':
             change_btn.setDisabled(True)
-        change_btn.clicked.connect(partial(self.parent.statusBtnClick, self.index, self.orderedItemId))
-            
+        change_btn.clicked.connect(partial(self.parent.statusBtnClick, self.index, self.orderItemId))
 
+    def getTypeStr(self, typeInt):
+        typeMap = {
+            1 : 'Dine-In',
+            2 : 'Pickup',
+            3 : 'Delivery'
+        }
+        return typeMap.get(typeInt)
 
 class Customer():
     def __init__(self, customer_data):
