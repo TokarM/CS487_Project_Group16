@@ -66,12 +66,3 @@ class checkout_dialog(object):
         self.pushButton_2.setText(_translate("Dialog", "Pay with points"))
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
-

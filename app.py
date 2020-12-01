@@ -74,10 +74,30 @@ class CustomerInterface(QMainWindow):
                 cell = QtWidgets.QTableWidgetItem(str(row[i]))
                 self.ui.tableWidget.setItem(row_count, i, cell)
         
+        
         self.cur.execute("SELECT * FROM customer_info WHERE customerID=%s;", (str(customerID)))
         self.customer = Customer(self.cur.fetchone())
         self.ui.customerName.setText(str(self.customer.name))
         self.ui.points.setText(str(self.customer.points))
+        
+        self.cur.execute("SELECT * FROM orders WHERE customerID=%s AND paid=FALSE;", (str(customerID)))
+        orders = self.cur.fetchall()
+        
+        
+        orders_row_count = self.ui.tableWidget1.rowCount()
+        for order in orders:
+            for item in self.menu:
+                if order[5] == item[0]:
+                    for i in range(3):
+                        cell = QtWidgets.QTableWidgetItem(str(item[i]))
+                        self.ui.tableWidget1.setItem(row_count, i, cell)
+                if (order[7] == False):
+                    cell = QtWidgets.QTableWidgetItem("Not ready")
+                    self.ui.tableWidget1.setItem(row_count, 3, cell)
+                else:
+                    cell = QtWidgets.QTableWidgetItem("Ready")
+                    self.ui.tableWidget1.setItem(row_count, 3, cell)
+            
     
         self.ui.add.clicked = self.ui.add.clicked.connect(self.addItem)
         self.ui.submit.clicked = self.ui.submit.clicked.connect(self.submitOrder) 
@@ -86,7 +106,6 @@ class CustomerInterface(QMainWindow):
     def payForOrder(self):
         checkoutform = CheckoutDialog(self.customer, self.cur)
         res = checkoutform.exec_()
-        
         
         
     def addItem(self):
@@ -148,21 +167,29 @@ class CustomerInterface(QMainWindow):
 class CheckoutDialog(QDialog):
     def __init__(self, customer, cur, parent=None):
         QDialog.__init__(self, parent)
-        cur.execute("SELECT price FROM orders WHERE customerid==%s AND paid==TRUE", (str(customer.id)))
+        cur.execute("SELECT price FROM orders WHERE customerid=%s AND paid=TRUE", (str(customer.id)))
         
-        self.total = sum(cur.fetchall)
-        self.label_5.setText("$" + str(self.total))
-        self.label_6.setText("$" + str(self.customer.points))
+        self.total = sum(cur.fetchall())
+        
         self.ui = checkout_dialog()
         self.ui.setupUi(self)
+        
         self.customer = customer
         self.cur = cur
+        
+        self.ui.label_5.setText("$" + str(self.total))
+        self.ui.label_7.setText("$" + str(self.customer.points))
+        
+        self.ui.pushButton.clicked = self.ui.pushButton.clicked.connect(self.payByMoney)
+        self.ui.pushButton_2.clicked = self.ui.pushButton_2.clicked.connect(self.payByPoints) 
+        
         
     def payByMoney(self):
         update = "UPDATE orders SET paid = TRUE WHERE customerid = {}".format(str(self.customer.id))
         self.cur.execute(update)
         update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
         self.cur.execute(update, (self.total*0.1, self.customer.id))
+        self.close()
         
     def payByPoints(self):
         if (self.customer.points > self.total):
@@ -219,7 +246,7 @@ class StaffInterface(QMainWindow):
         button.setDisabled(True)
         
         # change status of order row with ordereditemid = orderedItemId to ready = TRUE
-        update = "UPDATE orders SET ready = TRUE WHERE ordereditemid = {}".format(str(orderedItemId))
+        update = "UPDATE orders SET ready = TRUE WHERE orderitemid = {}".format(str(orderedItemId))
         self.cur.execute(update)
         # change table cell from 'Not Ready' to 'Ready'
         readyCell = QtWidgets.QTableWidgetItem('Ready')
@@ -293,8 +320,8 @@ def connect():
         conn = psycopg2.connect(
             host="localhost",
             database="cs487_app",
-            user="postgres",
-            password="at}&G?/.ncF7.9rz")
+            user="developer",
+            password="1")
         
         conn.autocommit = True
         
