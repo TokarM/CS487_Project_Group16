@@ -84,19 +84,22 @@ class CustomerInterface(QMainWindow):
         orders = self.cur.fetchall()
         
         
-        orders_row_count = self.ui.tableWidget1.rowCount()
+        
         for order in orders:
             for item in self.menu:
                 if order[5] == item[0]:
+                    orders_row_count = self.ui.tableWidget1.rowCount()
+                    self.ui.tableWidget1.setRowCount(orders_row_count+1)
                     for i in range(3):
                         cell = QtWidgets.QTableWidgetItem(str(item[i]))
-                        self.ui.tableWidget1.setItem(row_count, i, cell)
-                if (order[7] == False):
-                    cell = QtWidgets.QTableWidgetItem("Not ready")
-                    self.ui.tableWidget1.setItem(row_count, 3, cell)
-                else:
-                    cell = QtWidgets.QTableWidgetItem("Ready")
-                    self.ui.tableWidget1.setItem(row_count, 3, cell)
+                        self.ui.tableWidget1.setItem(orders_row_count, i, cell)
+                    if (order[7] == False):
+                        cell = QtWidgets.QTableWidgetItem("Not ready")
+                        self.ui.tableWidget1.setItem(orders_row_count, 3, cell)
+                    else:
+                        cell = QtWidgets.QTableWidgetItem("Ready")
+                        self.ui.tableWidget1.setItem(orders_row_count, 3, cell)
+                    
             
     
         self.ui.add.clicked = self.ui.add.clicked.connect(self.addItem)
