@@ -8,7 +8,7 @@ Created on Thu Nov 26 22:41:58 2020
 import sys
 import psycopg2
 from datetime import datetime
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QMessageBox
 from Login import login_interface
 from staff_interface import Ui_staff_interface as staff_interface
@@ -17,6 +17,7 @@ from checkout import checkout_dialog
 from update_user_info import update_user_info
 from functools import partial
 from sign_up_interface import Ui_sign_up_interface as sign_up_interface
+from salesreportv2 import sales_report
 
 class Login(QMainWindow):
     def __init__(self):
@@ -436,8 +437,37 @@ class StaffInterface(QMainWindow):
         self.app2.show()
 
     def genReport(self):
-         ### GO TO REPORT INTERFACE ###
+         salesreport = SalesReport(self.cur)
+         res = salesreport.exec_()
          return
+     
+class SalesReport(QDialog):
+    def __init__(self,cur,parent=None):
+            QDialog.__init__(self, parent)
+            super().__init__()
+        
+            self.cur = connect()
+            
+            self.ui = sales_report()
+            self.ui.setupUi(self)
+            self.dateEdit = QtWidgets.QDateEdit(self.centralwidget)
+            self.dateEdit.setGeometry(QtCore.QRect(10, 80, 151, 21))
+            self.dateEdit.setObjectName("dateEdit")
+            
+            date = str(self.dateEdit.date())
+            
+            self.cur.execute("SELECT * FROM orders WHERE date LIKE '%s%'",date)
+            self.menu = self.cur.fetchall()
+            
+            totalnumberofsales = self.cur.execute("SELECT COUNT (orderitemid) FROM orders WHERE date LIKE '%s%'",date)
+            totalprice = self.cur.execute("SELECT SUM (Price) FROM orders WHERE date LIKE '%s%'",date)
+            toptendishes = self.cur.execute("SELECT Item FROM orders GROUP BY Item  ORDER BY COUNT (*) DESC LIMIT 10 WHERE date LIKE '%s%' ",date)
+            
+            
+            
+            self.ui.label_2.setText("$" + str(self.total))
+            self.ui.label_2.setText("The total number of sales on" + date + "is" + str(totalnumberofsales) + "and the total sale made is $" + str(totalprice)+ "\n The top 10 dishes are :" + str(toptendishes))
+            
 
 class Order():
     def __init__(self, index, orderArr, parent):
