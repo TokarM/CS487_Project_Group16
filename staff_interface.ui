@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1556</width>
-    <height>1058</height>
+    <width>894</width>
+    <height>643</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1496</width>
-    <height>812</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -61,10 +61,10 @@
    <widget class="QPushButton" name="update_orders_btn">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>920</y>
-      <width>201</width>
-      <height>71</height>
+      <x>340</x>
+      <y>550</y>
+      <width>141</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -76,8 +76,8 @@
      <rect>
       <x>260</x>
       <y>110</y>
-      <width>1261</width>
-      <height>771</height>
+      <width>571</width>
+      <height>411</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -105,7 +105,7 @@
      <bool>true</bool>
     </property>
     <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>207</number>
+     <number>93</number>
     </attribute>
     <attribute name="horizontalHeaderMinimumSectionSize">
      <number>60</number>
@@ -150,10 +150,10 @@
    <widget class="QPushButton" name="update_menu_btn">
     <property name="geometry">
      <rect>
-      <x>1000</x>
-      <y>30</y>
-      <width>231</width>
-      <height>57</height>
+      <x>490</x>
+      <y>40</y>
+      <width>151</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -163,10 +163,10 @@
    <widget class="QPushButton" name="logout_btn">
     <property name="geometry">
      <rect>
-      <x>1280</x>
-      <y>30</y>
-      <width>231</width>
-      <height>57</height>
+      <x>660</x>
+      <y>40</y>
+      <width>171</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -177,6 +177,19 @@
     </property>
     <property name="text">
      <string>Log Out</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="gen_report_btn">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>550</y>
+      <width>211</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Generate Sales Report</string>
     </property>
    </widget>
   </widget>
