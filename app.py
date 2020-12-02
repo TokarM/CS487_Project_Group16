@@ -7,7 +7,7 @@ Created on Thu Nov 26 22:41:58 2020
 """
 import sys
 import psycopg2
-from datetime import datetime
+from datetime import datetime, timedelta as TimeDelta
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QMessageBox
 from Login import login_interface
@@ -450,24 +450,24 @@ class SalesReport(QDialog):
             
             self.ui = sales_report()
             self.ui.setupUi(self)
-            self.dateEdit = QtWidgets.QDateEdit(self.centralwidget)
-            self.dateEdit.setGeometry(QtCore.QRect(10, 80, 151, 21))
-            self.dateEdit.setObjectName("dateEdit")
-            
-            date = str(self.dateEdit.date())
-            
-            self.cur.execute("SELECT * FROM orders WHERE date LIKE '%s%'",date)
-            self.menu = self.cur.fetchall()
-            
-            totalnumberofsales = self.cur.execute("SELECT COUNT (orderitemid) FROM orders WHERE date LIKE '%s%'",date)
-            totalprice = self.cur.execute("SELECT SUM (Price) FROM orders WHERE date LIKE '%s%'",date)
-            toptendishes = self.cur.execute("SELECT Item FROM orders GROUP BY Item  ORDER BY COUNT (*) DESC LIMIT 10 WHERE date LIKE '%s%' ",date)
-            
-            
-            
-            self.ui.label_2.setText("$" + str(self.total))
-            self.ui.label_2.setText("The total number of sales on" + date + "is" + str(totalnumberofsales) + "and the total sale made is $" + str(totalprice)+ "\n The top 10 dishes are :" + str(toptendishes))
-            
+
+            self.ui.dateEdit.dateChanged.connect(self.genReport)
+
+            self.genReport()
+
+    def genReport(self):
+        startDateTime = self.ui.dateEdit.dateTime().toPyDateTime()
+        endDateTime = startDateTime + TimeDelta(days=1)
+        date = str(startDateTime)
+
+        self.cur.execute("SELECT * FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
+        self.menu = self.cur.fetchall()
+        
+        totalnumberofsales = self.cur.execute("SELECT COUNT (orderitemid) FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
+        totalprice = self.cur.execute("SELECT SUM (Price) FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
+        toptendishes = self.cur.execute("SELECT item FROM orders WHERE datetime >= %s AND datetime < %s GROUP BY item ORDER BY COUNT (*) DESC LIMIT 10", [startDateTime, endDateTime])
+        
+        self.ui.label_2.setText("The total number of sales on" + date + "is" + str(totalnumberofsales) + "and the total sale made is $" + str(totalprice)+ "\n The top 10 dishes are :" + str(toptendishes))
 
 class Order():
     def __init__(self, index, orderArr, parent):
