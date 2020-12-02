@@ -98,8 +98,8 @@ class SignUp(QMainWindow):
         self.cur.execute(sql, (newID, username, password, 2))
 
         # insert customer info
-        sql = """INSERT INTO customer_info (customerid, firstname, lastname, address, city, cardnumber)
-                 VALUES (%s, %s, %s, %s, %s, %s)"""
+        sql = """INSERT INTO customer_info (customerid, firstname, lastname, address, city, cardnumber, points)
+                 VALUES (%s, %s, %s, %s, %s, %s, 0)"""
 
         self.cur.execute(sql, (newID, firstName, lastName, address, city, cc))
 
@@ -189,7 +189,7 @@ class CustomerInterface(QMainWindow):
         
     def updateUserInfo(self):
         if self.customer.firstname != "Anonymous":
-            updateform = UpdateUserInfo(self.customer)
+            updateform = UpdateUserInfo(self.customer, self.cur)
             res = updateform.exec_()
         
         
@@ -220,9 +220,7 @@ class CustomerInterface(QMainWindow):
     def submitOrder(self):
         
         if not self.customer.orders:
-            msg = QMessageBox()
-            msg.setText(f"Your order is empty!")
-            msg.exec_()
+            pop_message(f"Your order is empty!")
             return
         
         index = 0
@@ -241,9 +239,7 @@ class CustomerInterface(QMainWindow):
         elif self.ui.radioButton_3.isChecked():
             ordertype = 3
         else:
-            msg = QMessageBox()
-            msg.setText(f"Please select order type")
-            msg.exec_()
+            pop_message(f"Please select order type")
             return
             
         for i in result:
@@ -272,14 +268,11 @@ class CustomerInterface(QMainWindow):
                     cell = QtWidgets.QTableWidgetItem("Submitted")
                     self.ui.tableWidget1.setItem(index, 3, cell)
                     
-                    self.customer.points += item[2]
                     index = index + 1
         
         self.customer.orders = []
         
-        msg = QMessageBox()
-        msg.setText(f"Approximate Waiting Time {time} minutes")
-        msg.exec_()
+        pop_message(f"Approximate Waiting Time {time} minutes")
         
 class CheckoutDialog(QDialog):
     def __init__(self, customer, cur, order_table, parent=None):
@@ -311,9 +304,7 @@ class CheckoutDialog(QDialog):
         update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
         self.cur.execute(update, (self.total*0.1, self.customer.id))
         
-        msg = QMessageBox()
-        msg.setText("Thank you for your payment")
-        msg.exec_()
+        pop_message("Thank you for your payment")
         
         self.order_table.setRowCount(0)
         self.order_table.setColumnCount(0)
@@ -323,25 +314,62 @@ class CheckoutDialog(QDialog):
         if (self.customer.points > self.total):
             update = "UPDATE orders SET paid = TRUE WHERE customerid = {}".format(str(self.customer.id))
             self.cur.execute(update)
-            
+        
             if self.customer.firstname != "Anonymous":
                 update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
-                self.cur.execute(update, (self.total*0.1, self.customer.id))
-            
-            msg = QMessageBox()
-            msg.setText("Thank you for your payment")
-            msg.exec_()
+                self.cur.execute(update, ((self.total * 0.1 - self.total), self.customer.id))
+        
+            pop_message("Thank you for your payment")
+            self.close()
             
 class UpdateUserInfo(QDialog):
-    def __init__(self, customer, parent=None):
+    def __init__(self, customer, cur, parent=None):
         QDialog.__init__(self, parent)
         self.ui = update_user_info()
         self.ui.setupUi(self)
         
+        cur.execute("SELECT username FROM login_info WHERE id=%s ", (str(customer.id)))
+        result = cur.fetchone()
+        username = result[0]
+        
+        self.ui.userNameLine.setText(username)
         self.ui.firstNameLine.setText(customer.firstname)
         self.ui.lastNameLine.setText(customer.lastname)
         self.ui.addressLine.setText(customer.address)
         self.ui.creditCardLine.setText(customer.cardnumber)
+        
+        self.customer = customer
+        self.cur = cur
+        self.username = username
+        
+        self.ui.updateInfoButton.clicked = self.ui.updateInfoButton.clicked.connect(self.update_info)
+        self.ui.updatePasswordButton.clicked = self.ui.updatePasswordButton.clicked.connect(self.update_password) 
+        
+    def update_info(self):
+        
+        username = str(self.ui.userNameLine.text())
+        firstname = str(self.ui.firstNameLine.text())
+        lastname = str(self.ui.lastNameLine.text())
+        address = str(self.ui.addressLine.text())
+        creditcard = str(self.ui.creditCardLine.text())
+        
+        
+        self.cur.execute("UPDATE login_info SET username=%s WHERE id=%s", (username, str(self.customer.id)))
+        self.cur.execute("UPDATE customer_info SET firstname=%s, lastname=%s, address=%s, cardnumber=%s WHERE customerid=%s",
+                 (firstname, lastname,
+                  address, creditcard, str(self.customer.id)))
+        pop_message("Your information was updated")
+    
+    def update_password(self):
+        self.cur.execute("SELECT password FROM login_info WHERE id=%s ", (str(self.customer.id)))
+        result = self.cur.fetchone()
+        password = result[0]
+        if self.ui.oldPasswordLine.text() == password:
+            self.cur.execute("UPDATE login_info SET password=%s WHERE id=%s", (str(self.ui.newPasswordLine.text()),str(self.customer.id)))
+            pop_message("Your password was updated")
+        else:
+            pop_message("Old password is incorrect")
+        
         
         
 class StaffInterface(QMainWindow):
@@ -476,7 +504,12 @@ class Customer():
             self.cardnumber = None
             self.points = 0
             self.orders = []
+ 
     
+def pop_message(message):
+    msg = QMessageBox()
+    msg.setText(message)
+    msg.exec_()
         
 def connect():
     conn = None
