@@ -16,6 +16,7 @@ from customer_interface import customer_interface
 from checkout import checkout_dialog
 from update_user_info import update_user_info
 from functools import partial
+from sign_up_interface import Ui_sign_up_interface as sign_up_interface
 
 class Login(QMainWindow):
     def __init__(self):
@@ -24,7 +25,7 @@ class Login(QMainWindow):
         self.ui.setupUi(self)
         self.ui.loginButton.clicked = self.ui.loginButton.clicked.connect(self.enterLogin)
         self.ui.pushButton_2.clicked = self.ui.pushButton_2.clicked.connect(self.anonymousLogin)
-        
+        self.ui.pushButton_4.clicked = self.ui.pushButton_4.clicked.connect(self.signUp)
         self.show()
         
     def anonymousLogin(self):
@@ -53,8 +54,74 @@ class Login(QMainWindow):
             msg = QMessageBox()
             msg.setText("Invalid Login Information")
             msg.exec_()
+    
+    def signUp(self):
+        self.hide()
+        self.app2 = SignUp()
+        self.app2.show()
             
+
+class SignUp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.ui = sign_up_interface()
+        self.ui.setupUi(self)
+
+        self.cur = connect()
+        self.ui.signup_btn.clicked = self.ui.signup_btn.clicked.connect(self.trySignUp)
+
+    def trySignUp(self):
+        username = str(self.ui.username_input.text())
+        password = str(self.ui.password_input.text())
+        firstName = str(self.ui.fn_input.text())
+        lastName = str(self.ui.ln_input.text())
+        address = str(self.ui.address_input.text())
+        city = str(self.ui.city_input.text())
+        cc = int(self.ui.cc_input.text())
+
+        # get last largest ID
+        self.cur.execute("SELECT MAX(id) AS maxid FROM login_info")
+        result = self.cur.fetchall()
+
+        largestID = 1
         
+        for i in result:
+            if i[0] is not None:
+                largestID = int(i[0])
+
+        newID = largestID + 1
+
+        # insert login info with customer privilege
+        sql = """INSERT INTO login_info (id, username, password, privilege) VALUES (%s, %s, %s, %s)"""
+
+        self.cur.execute(sql, (newID, username, password, 2))
+
+        # insert customer info
+        sql = """INSERT INTO customer_info (customerid, firstname, lastname, address, city, cardnumber)
+                 VALUES (%s, %s, %s, %s, %s, %s)"""
+
+        self.cur.execute(sql, (newID, firstName, lastName, address, city, cc))
+
+
+        # get customer info and login
+        self.cur.execute("SELECT (customerid) FROM customer_info WHERE firstname = %s AND lastname = %s", (firstName, lastName))
+
+        response = self.cur.fetchone()
+
+        if response is not None:
+            customerID = response[0]
+
+            self.hide()
+            self.app2 = CustomerInterface(customerID)
+            self.app2.show()
+        else:
+            msg = QMessageBox()
+            msg.setText("Failed sign up. Try again.")
+            msg.exec_()
+
+
+
         
 class CustomerInterface(QMainWindow):
     def __init__(self, customerID):
@@ -287,7 +354,8 @@ class StaffInterface(QMainWindow):
         self.table = self.ui.ordersTableWidget
 
         self.ui.update_orders_btn.clicked.connect(self.updateTable)
-
+        self.ui.gen_report_btn.clicked.connect(self.genReport)
+        self.ui.logout_btn.clicked.connect(self.logout)
         self.updateTable()
 
     def updateTable(self):
@@ -322,19 +390,26 @@ class StaffInterface(QMainWindow):
             order.initChangeBtn()
 
         
-    def statusBtnClick(self, index, orderedItemId):
-        button = QtWidgets.qApp.focusWidget()
-        #button.setDisabled(True)
-        
+    def statusBtnClick(self, index, orderedItemId):       
         # change status of order row with ordereditemid = orderedItemId to ready = TRUE
         update = "UPDATE orders SET ready = TRUE WHERE orderitemid = {}".format(str(orderedItemId))
         self.cur.execute(update)
+
         # change table cell from 'Not Ready' to 'Ready'
         readyCell = QtWidgets.QTableWidgetItem('Ready')
         self.table.setItem(index, 3, readyCell)
+
         # refresh table, remove order if item was last to be ready
         self.updateTable()
 
+    def logout(self):
+        self.hide()
+        self.app2 = Login()
+        self.app2.show()
+
+    def genReport(self):
+         ### GO TO REPORT INTERFACE ###
+         return
 
 class Order():
     def __init__(self, index, orderArr, parent):
