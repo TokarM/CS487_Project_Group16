@@ -121,8 +121,9 @@ class CustomerInterface(QMainWindow):
         res = checkoutform.exec_()
         
     def updateUserInfo(self):
-        updateform = UpdateUserInfo(self.customer)
-        res = updateform.exec_()
+        if self.customer.firstname != "Anonymous":
+            updateform = UpdateUserInfo(self.customer)
+            res = updateform.exec_()
         
         
     def addItem(self):
@@ -255,8 +256,10 @@ class CheckoutDialog(QDialog):
         if (self.customer.points > self.total):
             update = "UPDATE orders SET paid = TRUE WHERE customerid = {}".format(str(self.customer.id))
             self.cur.execute(update)
-            update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
-            self.cur.execute(update, (self.total*0.1, self.customer.id))
+            
+            if self.customer.firstname != "Anonymous":
+                update = "UPDATE customer_info SET points = points + %s  WHERE customerid = %s" 
+                self.cur.execute(update, (self.total*0.1, self.customer.id))
             
             msg = QMessageBox()
             msg.setText("Thank you for your payment")

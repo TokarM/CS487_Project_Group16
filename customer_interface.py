@@ -100,7 +100,7 @@ class customer_interface(object):
         self.pay.setObjectName("pay")
         
         self.customerName = QtWidgets.QLabel(self.centralwidget)
-        self.customerName.setGeometry(QtCore.QRect(770, 20, 59, 16))
+        self.customerName.setGeometry(QtCore.QRect(770, 20, 80, 16))
         self.customerName.setObjectName("customerName")
         self.points = QtWidgets.QLabel(self.centralwidget)
         self.points.setGeometry(QtCore.QRect(770, 70, 59, 16))
