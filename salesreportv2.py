@@ -19,7 +19,7 @@ class sales_report(object):
         self.label.setGeometry(QtCore.QRect(310, 10, 81, 16))
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(40, 130, 461, 71))
+        self.label_2.setGeometry(QtCore.QRect(40, 130, 600, 71))
         self.label_2.setObjectName("label_2")
 
         self.retranslateUi(Dialog)

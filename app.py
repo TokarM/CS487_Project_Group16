@@ -136,6 +136,7 @@ class CustomerInterface(QMainWindow):
         self.cur.execute("SELECT * FROM menu")
         self.menu = self.cur.fetchall()
         
+        
         for row in self.menu:
             row_count = self.ui.tableWidget.rowCount()
             self.ui.tableWidget.setRowCount(row_count+1)
@@ -218,13 +219,16 @@ class CustomerInterface(QMainWindow):
                 cell = QtWidgets.QTableWidgetItem("Added")
                 self.ui.tableWidget1.setItem(row_count, 3, cell)
                 
+                self.customer.waiting_time += item[2]
+                
+                
+        
     def submitOrder(self):
         
         if not self.customer.orders:
             pop_message(f"Your order is empty!")
             return
         
-        index = 0
 
         # get last largest transaction ID
         self.cur.execute("SELECT MAX(transactionid) AS maxid FROM orders")
@@ -249,9 +253,9 @@ class CustomerInterface(QMainWindow):
         
         # set new transaction ID to last largest + 1
         transactionID = largestID + 1
-        time = 0
         
-
+        index = self.ui.tableWidget1.rowCount() - len(self.customer.orders)
+        
         for order in self.customer.orders:
             for item in self.menu:
                 if order == item[0]:
@@ -263,17 +267,18 @@ class CustomerInterface(QMainWindow):
 
                     (str(transactionID), str(ordertype), str(datetime.now()),
                      str(self.customer.id), str(item[0]), str(int(item[1]))))
-
-                    time += item[2]  
-                        
+                    
+    
                     cell = QtWidgets.QTableWidgetItem("Submitted")
                     self.ui.tableWidget1.setItem(index, 3, cell)
+                    index += 1
                     
-                    index = index + 1
+                    
+                    
         
         self.customer.orders = []
         
-        pop_message(f"Approximate Waiting Time {time} minutes")
+        pop_message(f"Approximate Waiting Time {self.customer.waiting_time} minutes")
         
 class CheckoutDialog(QDialog):
     def __init__(self, customer, cur, order_table, parent=None):
@@ -307,8 +312,12 @@ class CheckoutDialog(QDialog):
         
         pop_message("Thank you for your payment")
         
+        self.customer.waiting_time = 0
+        
+        while (self.order_table.rowCount() > 0):
+            self.order_table.removeRow(0)
+        
         self.order_table.setRowCount(0)
-        self.order_table.setColumnCount(0)
         self.close()
         
     def payByPoints(self):
@@ -321,6 +330,14 @@ class CheckoutDialog(QDialog):
                 self.cur.execute(update, ((self.total * 0.1 - self.total), self.customer.id))
         
             pop_message("Thank you for your payment")
+            
+            self.customer.waiting_time = 0
+            
+            while (self.order_table.rowCount() > 0):
+                self.order_table.removeRow(0)
+        
+            self.order_table.setRowCount(0)
+            
             self.close()
             
 class UpdateUserInfo(QDialog):
@@ -463,11 +480,14 @@ class SalesReport(QDialog):
         self.cur.execute("SELECT * FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
         self.menu = self.cur.fetchall()
         
-        totalnumberofsales = self.cur.execute("SELECT COUNT (orderitemid) FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
-        totalprice = self.cur.execute("SELECT SUM (Price) FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
-        toptendishes = self.cur.execute("SELECT item FROM orders WHERE datetime >= %s AND datetime < %s GROUP BY item ORDER BY COUNT (*) DESC LIMIT 10", [startDateTime, endDateTime])
+        self.cur.execute("SELECT COUNT (orderitemid) FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
+        totalnumberofsales = self.cur.fetchone()
+        self.cur.execute("SELECT SUM (Price) FROM orders WHERE datetime >= %s AND datetime < %s", [startDateTime, endDateTime])
+        totalprice = self.cur.fetchone()
+        self.cur.execute("SELECT item FROM orders WHERE datetime >= %s AND datetime < %s GROUP BY item ORDER BY COUNT (*) DESC LIMIT 10", [startDateTime, endDateTime])
+        toptendishes = self.cur.fetchall()
         
-        self.ui.label_2.setText("The total number of sales on" + date + "is" + str(totalnumberofsales) + "and the total sale made is $" + str(totalprice)+ "\n The top 10 dishes are :" + str(toptendishes))
+        self.ui.label_2.setText("The total number of sales on " + date + " is " + str(totalnumberofsales[0]) + " and the total sale made is $" + str(totalprice[0])+ "\n The top 10 dishes are: " + str(toptendishes))
 
 class Order():
     def __init__(self, index, orderArr, parent):
@@ -526,6 +546,7 @@ class Customer():
             self.cardnumber = customer_data[5]
             self.points = customer_data[6]
             self.orders = []
+            self.waiting_time = 0
         else:
             self.id = 0
             self.firstname = "Anonymous"
@@ -534,7 +555,7 @@ class Customer():
             self.cardnumber = None
             self.points = 0
             self.orders = []
- 
+            self.waiting_time = 0
     
 def pop_message(message):
     msg = QMessageBox()
