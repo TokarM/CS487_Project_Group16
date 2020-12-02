@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         self.dateEdit = QtWidgets.QDateEdit(self.centralwidget)
         self.dateEdit.setGeometry(QtCore.QRect(10, 80, 151, 21))
         self.dateEdit.setObjectName("dateEdit")
-        self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
+        """self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
         self.tableWidget.setGeometry(QtCore.QRect(10, 110, 321, 321))
         self.tableWidget.setRowCount(10)
         self.tableWidget.setColumnCount(3)
@@ -36,7 +36,7 @@ class Ui_MainWindow(object):
         self.tableWidget_2.setColumnCount(3)
         self.tableWidget_2.setObjectName("tableWidget_2")
         self.tableWidget_2.horizontalHeader().setMinimumSectionSize(1000)
-        self.tableWidget_2.verticalHeader().setDefaultSectionSize(30)
+        self.tableWidget_2.verticalHeader().setDefaultSectionSize(30)"""
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
@@ -45,6 +45,7 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
